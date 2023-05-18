@@ -1,9 +1,28 @@
-import Image from "next/image";
-import { Inter } from "next/font/google";
+import { GetServerSideProps } from "next";
+import { getSession, signIn, useSession } from "next-auth/react";
 
-const inter = Inter({ subsets: ["latin"] });
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+  const session = getSession({ req });
+  if (!!session) {
+    return {
+      redirect: {
+        destination: "/app",
+        permanent: false,
+      },
+    };
+  }
+  return {
+    props: {},
+  };
+};
 
-export default function Home() {
+export default function SignIn() {
+  const { data } = useSession();
+  
+  function handleSignIn() {
+    signIn("github");
+  }
+
   return (
     <div className="h-screen bg-gray-50 flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -15,6 +34,7 @@ export default function Home() {
         <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
           Sign in to your account
         </h2>
+        <p>{JSON.stringify(data)}</p>
       </div>
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
@@ -73,6 +93,18 @@ export default function Home() {
               className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
               Sign in
+            </button>
+          </div>
+
+          <div className="flex justify-center gap-5">
+            <div>
+              <p>Facebook</p>
+            </div>
+            <div>
+              <p>Twitter</p>
+            </div>
+            <button onClick={handleSignIn} className="px-2 hover:bg-violet-500">
+              <p className="text-black">Github</p>
             </button>
           </div>
         </form>
